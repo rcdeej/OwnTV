@@ -279,7 +279,8 @@ fun PlayerHud(
     val nextCardDue by remember(isLive, duration) { derivedStateOf { msToAdvance() in 0L..30_000L } }
     val showNextCard = !isLive && error == null && nav.hasNext && nextUpTitle != null && !stopsAtItemEnd &&
         nextCardDue && !autoNextDismissed
-
+        
+    var startHide by remember { mutableStateOf(true) }
     var controlsVisible by remember { mutableStateOf(true) }
     var showInfo by remember { mutableStateOf(false) } // stream technical-info overlay
     // Used only by "Report this stream", which writes the current readout into the playback log.
@@ -432,7 +433,7 @@ fun PlayerHud(
     }
     LaunchedEffect(controlsVisible, wakeTick, forceShow, inert) {
         // Don't auto-hide under an overlay — hiding is what triggers the catch-all focus grab below.
-        if (controlsVisible && !forceShow && !inert) { delay(0); controlsVisible = false }
+        if (controlsVisible && !forceShow && !inert) { delay(if (startHide) 500 else 4500); startHide = false; controlsVisible = false }
     }
     LaunchedEffect(controlsVisible, error, dialog, inert, showNextCard) {
         // Never steal focus while a dialog is open (its rows own it) or while a shell overlay is up
