@@ -433,7 +433,7 @@ fun PlayerHud(
     }
     LaunchedEffect(controlsVisible, wakeTick, forceShow, inert) {
         // Don't auto-hide under an overlay — hiding is what triggers the catch-all focus grab below.
-        if (controlsVisible && !forceShow && !inert) { delay(if (startHide) 500 else 4500); startHide = false; controlsVisible = false }
+        if (controlsVisible && !forceShow && !inert) { delay(if (startHide) 100 else 4500); startHide = false; controlsVisible = false }
     }
     LaunchedEffect(controlsVisible, error, dialog, inert, showNextCard) {
         // Never steal focus while a dialog is open (its rows own it) or while a shell overlay is up
@@ -853,7 +853,8 @@ fun PlayerHud(
             // the panel's own countdown and the engine re-asks by itself. The line under the spinner says
             // why nothing is happening yet, so nobody reaches for Retry (or thinks the channel is dead).
             buffering -> Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                OwnTVSpinner(sizeDp = 56)
+                val spinnerDue by produceState(false) { delay(1500); value = true }
+                if (spinnerDue || providerBackOff != null) OwnTVSpinner(sizeDp = 56)
                 val stalledSince = stalledSinceMs
                 if (providerBackOff == null && stalledSince != null) {
                     val showNotice by produceState(false, stalledSince) {
